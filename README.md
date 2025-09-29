@@ -9,6 +9,6 @@ This repository contains our implementation for our research "MLMA: TOWARDS MULT
 
 # MLMA architecture
 <div style="text-align: center;">
-    <img src="https://github.com/mnabihali/MLMA/blob/main/assets/Mamba%20arc.png" style="border-radius: 15px;" />
+    <img src="https://github.com/mnabihali/MLMA/blob/main/assets/Mamba%20arc.png" style="border-radius: 13px;" />
 </div>
 
