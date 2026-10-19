@@ -1,182 +1,110 @@
-
-<div align="center">
-
 🌍 MLMA
 
-Multilingual Automatic Speech Recognition with Mamba-Based Architectures
+From Mono- to Multilingual ASR with Mamba-Based Architectures
 
-Scaling efficient state-space models to multilingual speech recognition
+Efficient multilingual speech recognition with bidirectional state-space models
 
+
+
+
+
+
+Authors: Mohamed Nabih Ali, Daniele Falavigna, Alessio Brutti
+Affiliation: SpeechTek, Fondazione Bruno Kessler (FBK), Trento, Italy
+Contact: mnabih@fbk.eu
 
 <br>
 
-<img src="assets/Mamba%20arc.png" alt="MLMA architecture" width="850">
+<img src="assets/Mamba%20arc.png" alt="MLMA architecture" width="820"/>
 
 <br>
 
-MLMA explores Mamba-based sequence modeling for multilingual ASR, combining a convolutional front end, a ConMamba-style encoder with bidirectional Mamba, and Connectionist Temporal Classification (CTC).
-
-Overview · Architecture · Results · Installation · Training · Citation
+Overview ·
+Architecture ·
+Datasets ·
+Results ·
+Installation ·
+Training ·
+Citation
 
 </div>
 
-🔎 Overview
+📖 Overview
 
-Automatic speech recognition systems must model long, variable-length speech sequences while learning acoustic patterns shared across languages. Transformer-based encoders can be effective, but self-attention becomes increasingly expensive as sequence length grows.
+MLMA explores Mamba-based architectures for multilingual automatic speech recognition (ASR). It replaces the self-attention component of a Conformer-style encoder with bidirectional Mamba blocks, combining local acoustic modeling with efficient sequence processing.
 
-MLMA investigates selective state-space modeling as an efficient alternative for multilingual ASR. The model is trained jointly across six European languages using a shared multilingual character vocabulary and a CTC objective.
+The model is trained jointly on six European languages with a shared character-level output vocabulary and a Connectionist Temporal Classification (CTC) objective.
 
-Highlights
+Key contributions
 
-🌐 Six languages: English, Italian, French, Spanish, German, and Dutch.
+🌐 Multilingual scale: joint training across English, Italian, French, Spanish, German, and Dutch.
 
-🎙️ 11,840 hours of multilingual transcribed speech used for training.
+🎙️ 11,840 hours of speech: a multilingual training mixture assembled from public speech corpora.
 
-🧩 Mamba-based encoder: combines local convolutional processing with bidirectional state-space sequence modeling.
+🧠 Mamba-based sequence modeling: bidirectional state-space blocks integrated into a Conformer-style encoder.
 
-🔤 End-to-end CTC recognition: shared character-level output vocabulary across languages.
+🔤 Shared CTC output: one multilingual character vocabulary across the six languages.
 
-⚡ Long-context efficiency: evaluates inference latency and encoder memory as audio duration increases.
+⚡ Long-audio efficiency: evaluation of encoder latency and memory as audio duration increases.
 
-🔬 Matched baseline: comparison with a CTC-Conformer of similar model size.
+⚖️ Comparable model size: MLMA has 31.6M parameters, compared with 28.8M for the CTC-Conformer baseline.
 
-Main result: In the paper's long-context efficiency experiment, encoder inference time grows from approximately 25 ms to 75 ms for MLMA as audio duration increases from 5 s to 256 s, compared with 23 ms to 608 ms for the CTC-Conformer baseline. At 256 s, the paper reports encoder memory below 500 MB for MLMA, versus more than 14 GB for Conformer.
+Headline result: In the reported long-context experiment, MLMA encoder inference time increases from approximately 25 ms for 5-second audio to 75 ms for 256-second audio. The CTC-Conformer baseline increases from approximately 23 ms to 608 ms. The paper also reports less than 500 MB encoder memory for MLMA at 256 seconds, compared with more than 14 GB for Conformer.
 
-🧠 Architecture
+🏗️ Architecture
 
-<p align="center">
-  <img src="assets/Mamba%20arc.png" alt="MLMA model architecture" width="850">
-</p>
+The MLMA pipeline consists of four main stages:
 
-The MLMA pipeline follows these stages:
+Acoustic features — 80-dimensional log-Mel filterbanks, computed with a 25 ms window and 10 ms frame shift, followed by utterance-level mean and variance normalization.
 
-Acoustic features: input audio is converted to 80-dimensional log-Mel filterbank features using a 25 ms analysis window and a 10 ms frame shift. Utterance-level mean and variance normalization is applied.
+CNN front end — two convolutional blocks capture local acoustic patterns and downsample the input sequence.
 
-CNN feature extractor: two convolutional blocks extract local acoustic features and downsample the time dimension.
+ConMamba encoder — an 18-layer encoder uses bidirectional Mamba for sequence modeling alongside convolutional modules for local context.
 
-ConMamba encoder: an 18-layer encoder uses a Conformer-style block in which bidirectional Mamba replaces multi-head self-attention, while the convolution module models local patterns.
+CTC prediction head — a linear projection and LogSoftmax produce frame-level character probabilities, trained with CTC loss.
 
-CTC output layer: a linear projection and LogSoftmax produce frame-level character probabilities, optimized with CTC loss.
+Model configuration reported in the paper
 
-Reported model configuration
+<table>
+<thead>
+<tr><th align="left">Component</th><th align="left">Setting</th><th align="left">Component</th><th align="left">Setting</th></tr>
+</thead>
+<tbody>
+<tr><td>Input features</td><td>80-dim log-Mel</td><td>Feature window / shift</td><td>25 ms / 10 ms</td></tr>
+<tr><td>CNN front end</td><td>2 convolutional blocks</td><td>Encoder depth</td><td>18 layers</td></tr>
+<tr><td>Hidden dimension</td><td>256</td><td>Feed-forward dimension</td><td>1,024</td></tr>
+<tr><td>Dropout</td><td>0.1</td><td>Activation</td><td>GELU</td></tr>
+<tr><td>Mamba state dimension</td><td>16</td><td>Mamba expansion</td><td>2</td></tr>
+<tr><td>Mamba convolution width</td><td>4</td><td>Prediction objective</td><td>CTC</td></tr>
+<tr><td>Output vocabulary</td><td colspan="3">Shared multilingual character vocabulary</td></tr>
+<tr><td>Model size</td><td colspan="3">31.6M parameters (MLMA); 28.8M parameters (CTC-Conformer baseline)</td></tr>
+</tbody>
+</table>
 
-Component
+These are the values reported in the paper. Check the selected configuration file in the code before assuming that every setting matches the reported experiment.
 
-Configuration
+🌍 Datasets
 
-Input features
+MLMA is trained jointly on six languages. The training-hour totals below are reported in the paper.
 
-80-dimensional log-Mel filterbanks
-
-Feature window / shift
-
-25 ms / 10 ms
-
-CNN front end
-
-2 convolutional blocks
-
-Encoder depth
-
-18 layers
-
-Encoder hidden dimension
-
-256
-
-Feed-forward dimension
-
-1024
-
-Dropout
-
-0.1
-
-Activation
-
-GELU
-
-Bi-Mamba state dimension
-
-16
-
-Bi-Mamba expansion
-
-2
-
-Bi-Mamba convolution width
-
-4
-
-Output
-
-Shared multilingual character vocabulary
-
-Objective
-
-Connectionist Temporal Classification (CTC)
-
-Parameters
-
-31.6M for the reported MLMA model
-
-These values describe the configuration reported in the paper. Check the selected training configuration in the repository before assuming every setting is identical.
-
-🌍 Languages and datasets
-
-MLMA is trained jointly on six languages:
-
-Language
-
-Code
-
-Training hours reported in the paper
-
-English
-
-en
-
-2,760
-
-Italian
-
-it
-
-574
-
-French
-
-fr
-
-2,112
-
-Spanish
-
-es
-
-1,569
-
-German
-
-de
-
-3,178
-
-Dutch
-
-nl
-
-1,646
-
-Total
-
-—
-
-11,840
+<table>
+<thead>
+<tr><th align="left">Language</th><th align="center">Code</th><th align="right">Training hours</th><th align="left">Corpus sources</th></tr>
+</thead>
+<tbody>
+<tr><td>English</td><td align="center"><code>en</code></td><td align="right">2,760</td><td>LibriSpeech, Common Voice, VoxPopuli-ASR</td></tr>
+<tr><td>Italian</td><td align="center"><code>it</code></td><td align="right">574</td><td>Common Voice, MLS</td></tr>
+<tr><td>French</td><td align="center"><code>fr</code></td><td align="right">2,112</td><td>Common Voice, VoxPopuli-ASR, MLS</td></tr>
+<tr><td>Spanish</td><td align="center"><code>es</code></td><td align="right">1,569</td><td>Common Voice, MLS</td></tr>
+<tr><td>German</td><td align="center"><code>de</code></td><td align="right">3,178</td><td>Common Voice, VoxPopuli-ASR, MLS</td></tr>
+<tr><td>Dutch</td><td align="center"><code>nl</code></td><td align="right">1,646</td><td>Common Voice, MLS</td></tr>
+<tr><th align="left">Total</th><td align="center">—</td><th align="right">11,840</th><td>Six-language training mixture</td></tr>
+</tbody>
+</table>
 
 The training mixture draws on:
 
-LibriSpeech (LS) — English
+LibriSpeech (LS)
 
 Common Voice v20.0 (CV)
 
@@ -184,325 +112,218 @@ VoxPopuli-ASR (VP-ASR)
 
 Multilingual LibriSpeech (MLS)
 
-FLEURS is reserved for evaluation and is not used for training. It is used to assess generalization to an unseen benchmark.
+Evaluation note: FLEURS is used as an unseen evaluation benchmark and is not included in the MLMA training mixture.
 
-Dataset access, licensing, and preparation requirements are governed by the individual corpus providers. Please obtain each dataset from its official source and follow its terms of use.
+Please obtain each corpus from its official source and comply with its licensing and usage conditions.
 
 📊 Results
 
-Monolingual LibriSpeech-960h
-
-MLMA and the CTC-Conformer baseline are trained from scratch on LibriSpeech-960h under matched conditions.
-
-Model
-
-Parameters
-
-Test-clean WER ↓
-
-Test-other WER ↓
-
-CTC-Conformer
-
-28.8M
-
-4.27%
-
-11.29%
-
-MLMA
-
-31.6M
-
-4.05%
-
-10.50%
-
-Multilingual comparison with CTC-Conformer
-
-Selected results reported in the paper:
-
-Evaluation set
-
-Language
-
-CTC-Conformer WER ↓
-
-MLMA WER ↓
-
-LibriSpeech
-
-English
-
-8.7%
-
-7.2%
-
-Common Voice
-
-English
-
-24.7%
-
-23.2%
-
-Common Voice
-
-Italian
-
-16.8%
-
-13.0%
-
-Common Voice
-
-French
-
-17.8%
-
-15.0%
-
-Common Voice
-
-Spanish
-
-14.2%
-
-11.2%
-
-Common Voice
-
-German
-
-15.9%
-
-12.9%
-
-Common Voice
-
-Dutch
-
-18.9%
-
-16.8%
-
-MLS
-
-Italian
-
-14.8%
-
-13.3%
-
-MLS
-
-French
-
-10.7%
-
-9.1%
-
-MLS
-
-Spanish
-
-7.3%
-
-6.5%
-
-MLS
-
-German
-
-10.6%
-
-9.5%
-
-MLS
-
-Dutch
-
-17.3%
-
-14.8%
-
-FLEURS (unseen)
-
-English
-
-21.6%
-
-19.2%
-
-FLEURS (unseen)
-
-Italian
-
-14.8%
-
-12.5%
-
-FLEURS (unseen)
-
-French
-
-21.1%
-
-19.6%
-
-FLEURS (unseen)
-
-Spanish
-
-12.6%
-
-10.6%
-
-FLEURS (unseen)
-
-German
-
-18.2%
-
-15.4%
-
-FLEURS (unseen)
-
-Dutch
-
-30.6%
-
-27.9%
-
-WER values are transcribed from the paper's multilingual results table. FLEURS is an unseen evaluation benchmark for MLMA; comparisons with systems trained on larger corpora are not necessarily matched-data comparisons.
-
-Long-context efficiency
-
-The paper evaluates encoder inference as audio duration increases from 5 to 256 seconds.
-
-Metric
-
-MLMA
-
-CTC-Conformer
-
-Encoder inference time, 5 s
-
-~25 ms
-
-~23 ms
-
-Encoder inference time, 256 s
-
-~75 ms
-
-~608 ms
-
-Time growth, 5 s → 256 s
-
-~3.0×
-
-~26.7×
-
-Encoder peak memory at 256 s
-
-<500 MB (reported in abstract/conclusion)
-
->14 GB
-
-These measurements are from the paper's reported experimental setup; actual speed and memory depend on hardware, precision, batch size, and software versions.
-
-🛠️ Installation
-
-MLMA builds on Mamba-ASR/ConMamba and uses PyTorch-based speech training components. Mamba-related packages can be sensitive to CUDA, PyTorch, compiler, and GPU compatibility.
+WER is reported as a percentage; lower is better. Bold values indicate the better result within each comparison.
+
+1. Monolingual ASR — LibriSpeech-960h
+
+<table>
+<thead>
+<tr><th align="left">Model</th><th align="right">Parameters</th><th align="right">test-clean WER ↓</th><th align="right">test-other WER ↓</th></tr>
+</thead>
+<tbody>
+<tr><td>CTC-Conformer</td><td align="right">28.8M</td><td align="right">4.27%</td><td align="right">11.29%</td></tr>
+<tr><td><strong>MLMA</strong></td><td align="right"><strong>31.6M</strong></td><td align="right"><strong>4.05%</strong></td><td align="right"><strong>10.50%</strong></td></tr>
+</tbody>
+</table>
+
+2. Multilingual ASR — Common Voice
+
+<table>
+<thead>
+<tr><th align="left">Language</th><th align="center">Code</th><th align="right">CTC-Conformer WER ↓</th><th align="right">MLMA WER ↓</th><th align="right">Relative WER reduction</th></tr>
+</thead>
+<tbody>
+<tr><td>English</td><td align="center"><code>en</code></td><td align="right">24.7%</td><td align="right"><strong>23.2%</strong></td><td align="right">6.1%</td></tr>
+<tr><td>Italian</td><td align="center"><code>it</code></td><td align="right">16.8%</td><td align="right"><strong>13.0%</strong></td><td align="right">22.6%</td></tr>
+<tr><td>French</td><td align="center"><code>fr</code></td><td align="right">17.8%</td><td align="right"><strong>15.0%</strong></td><td align="right">15.7%</td></tr>
+<tr><td>Spanish</td><td align="center"><code>es</code></td><td align="right">14.2%</td><td align="right"><strong>11.2%</strong></td><td align="right">21.1%</td></tr>
+<tr><td>German</td><td align="center"><code>de</code></td><td align="right">15.9%</td><td align="right"><strong>12.9%</strong></td><td align="right">18.9%</td></tr>
+<tr><td>Dutch</td><td align="center"><code>nl</code></td><td align="right">18.9%</td><td align="right"><strong>16.8%</strong></td><td align="right">11.1%</td></tr>
+</tbody>
+</table>
+
+3. Multilingual ASR — MLS
+
+<table>
+<thead>
+<tr><th align="left">Language</th><th align="center">Code</th><th align="right">CTC-Conformer WER ↓</th><th align="right">MLMA WER ↓</th><th align="right">Relative WER reduction</th></tr>
+</thead>
+<tbody>
+<tr><td>Italian</td><td align="center"><code>it</code></td><td align="right">14.8%</td><td align="right"><strong>13.3%</strong></td><td align="right">10.1%</td></tr>
+<tr><td>French</td><td align="center"><code>fr</code></td><td align="right">10.7%</td><td align="right"><strong>9.1%</strong></td><td align="right">15.0%</td></tr>
+<tr><td>Spanish</td><td align="center"><code>es</code></td><td align="right">7.3%</td><td align="right"><strong>6.5%</strong></td><td align="right">11.0%</td></tr>
+<tr><td>German</td><td align="center"><code>de</code></td><td align="right">10.6%</td><td align="right"><strong>9.5%</strong></td><td align="right">10.4%</td></tr>
+<tr><td>Dutch</td><td align="center"><code>nl</code></td><td align="right">17.3%</td><td align="right"><strong>14.8%</strong></td><td align="right">14.5%</td></tr>
+</tbody>
+</table>
+
+4. Generalization — FLEURS (unseen benchmark)
+
+<table>
+<thead>
+<tr><th align="left">Language</th><th align="center">Code</th><th align="right">CTC-Conformer WER ↓</th><th align="right">MLMA WER ↓</th><th align="right">Relative WER reduction</th></tr>
+</thead>
+<tbody>
+<tr><td>English</td><td align="center"><code>en</code></td><td align="right">21.6%</td><td align="right"><strong>19.2%</strong></td><td align="right">11.1%</td></tr>
+<tr><td>Italian</td><td align="center"><code>it</code></td><td align="right">14.8%</td><td align="right"><strong>12.5%</strong></td><td align="right">15.5%</td></tr>
+<tr><td>French</td><td align="center"><code>fr</code></td><td align="right">21.1%</td><td align="right"><strong>19.6%</strong></td><td align="right">7.1%</td></tr>
+<tr><td>Spanish</td><td align="center"><code>es</code></td><td align="right">12.6%</td><td align="right"><strong>10.6%</strong></td><td align="right">15.9%</td></tr>
+<tr><td>German</td><td align="center"><code>de</code></td><td align="right">18.2%</td><td align="right"><strong>15.4%</strong></td><td align="right">15.4%</td></tr>
+<tr><td>Dutch</td><td align="center"><code>nl</code></td><td align="right">30.6%</td><td align="right"><strong>27.9%</strong></td><td align="right">8.8%</td></tr>
+</tbody>
+</table>
+
+The relative WER reductions above are calculated from the displayed WER values. Results are transcribed from the paper's reported tables; evaluation setups and training data may differ across external systems.
+
+5. Long-context efficiency
+
+<table>
+<thead>
+<tr><th align="left">Metric</th><th align="right">MLMA</th><th align="right">CTC-Conformer</th></tr>
+</thead>
+<tbody>
+<tr><td>Encoder latency — 5 s audio</td><td align="right">≈ 25 ms</td><td align="right">≈ 23 ms</td></tr>
+<tr><td>Encoder latency — 256 s audio</td><td align="right">≈ 75 ms</td><td align="right">≈ 608 ms</td></tr>
+<tr><td>Latency growth — 5 s to 256 s</td><td align="right"><strong>≈ 3.0×</strong></td><td align="right">≈ 26.7×</td></tr>
+<tr><td>Encoder memory — 256 s audio</td><td align="right"><strong>&lt; 500 MB</strong></td><td align="right">&gt; 14 GB</td></tr>
+</tbody>
+</table>
+
+Actual latency and memory depend on the hardware, precision, batch size, and software environment used.
+
+⚙️ Installation
 
 1. Clone the repository
 
 git clone https://github.com/mnabihali/MLMA.git
 cd MLMA
 
-2. Create an environment
+2. Create the environment
 
-The upstream Mamba-ASR project documents a Python 3.9 environment. Treat this as a starting point, and adapt it to the versions required by your target machine.
+The upstream Mamba-ASR project documents a Python 3.9 environment. Use this as a starting point and adjust versions to match your CUDA and GPU environment.
 
-conda create -n mlma python=3.9
+conda create --name mlma python=3.9 --yes
 conda activate mlma
 
 3. Install dependencies
 
-If this repository contains a requirements file, install it with:
+Run the command that matches the requirements filename included in your checkout:
 
-pip install -r requirements.txt
+<details>
+<summary><strong>📦 If the repository contains <code>requirements.txt</code></strong></summary>
 
-If the file is named requirement.txt instead, use:
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 
-pip install -r requirement.txt
+</details>
 
-Before training, verify that your installed PyTorch, CUDA, mamba-ssm, and causal-conv1d versions are mutually compatible. Follow the installation instructions for the exact Mamba implementation used by your checkout.
+<details>
+<summary><strong>📦 If the repository contains <code>requirement.txt</code></strong></summary>
+
+python -m pip install --upgrade pip
+python -m pip install -r requirement.txt
+
+</details>
+
+Compatibility tip: Mamba-related dependencies can be sensitive to the exact PyTorch, CUDA, compiler, mamba-ssm, and causal-conv1d versions. Install compatible versions for your system before launching a long training run.
 
 🚀 Training
 
-MLMA uses the CTC training entry point, train_CTC.py. The upstream Mamba-ASR recipe launches CTC training with torchrun, a YAML hyperparameter file, a data directory, and a precision setting.
+The CTC training entry point is train_CTC.py. The command below follows the torchrun style used by the upstream Mamba-ASR project. Replace the configuration and data paths with the ones supplied by your MLMA checkout.
 
-Multi-GPU training
+1. Configure your experiment
 
-From the repository root, the upstream-style command is:
+Before training, identify the YAML configuration file for the MLMA experiment and the dataset directory expected by that configuration.
 
-torchrun --nproc-per-node 4 train_CTC.py <PATH_TO_CTC_CONFIG.yaml> --data_folder <PATH_TO_DATA> --precision bf16
+<MLMA_REPOSITORY>/
+├── train_CTC.py
+├── <PATH_TO_CTC_CONFIG.yaml>
+└── <PATH_TO_DATA>/
 
-Replace:
+2. Launch multi-GPU training
 
-<PATH_TO_CTC_CONFIG.yaml> with the MLMA CTC configuration you intend to train.
+torchrun \
+  --standalone \
+  --nnodes=1 \
+  --nproc_per_node=4 \
+  train_CTC.py \
+  <PATH_TO_CTC_CONFIG.yaml> \
+  --data_folder <PATH_TO_DATA> \
+  --precision bf16
 
-<PATH_TO_DATA> with the directory expected by the dataset preparation pipeline.
+Before running, replace these placeholders:
 
-4 with the number of GPUs available to the run, if supported by your distributed setup.
+Placeholder
 
-bf16 with a supported precision setting for your GPU and training configuration.
+Replace with
 
-For example, if you are using the upstream configuration layout unchanged, the original Mamba-ASR recipe is:
+<PATH_TO_CTC_CONFIG.yaml>
 
-torchrun --nproc-per-node 4 train_CTC.py hparams/CTC/conmamba_large.yaml --data_folder <PATH_TO_LIBRISPEECH> --precision bf16
+Path to the YAML configuration for the MLMA experiment
 
-This example is the upstream LibriSpeech recipe, not a guarantee that the same YAML file or data layout is appropriate for multilingual MLMA training. Use the MLMA-specific configuration and dataset manifest expected by your version of the code.
+<PATH_TO_DATA>
 
-Training checklist
+Dataset root expected by the training recipe
 
-Download and prepare the required corpora.
+4
 
-Verify the dataset manifests and paths used by the selected configuration.
+Number of GPUs assigned to this run
 
-Confirm that the output vocabulary covers the languages and transcripts in the training mixture.
+bf16
 
-Check GPU, CUDA, PyTorch, and Mamba package compatibility.
+Precision supported by your GPU and codebase
 
-Choose a precision supported by your hardware.
+Important: The exact configuration filename and data layout must match the files and argument parser in your checkout. The command above is a launch template, not a claim that a particular MLMA configuration is already present in the public repository.
 
-Save the training configuration and software versions alongside each experiment for reproducibility.
+<details>
+<summary><strong>🔧 Upstream Mamba-ASR example (LibriSpeech / ConMamba)</strong></summary>
+
+The upstream project documents the following CTC recipe. Use it only if you are intentionally running that upstream configuration and its expected LibriSpeech layout:
+
+torchrun --nproc-per-node 4 train_CTC.py \
+  hparams/CTC/conmamba_large.yaml \
+  --data_folder <PATH_TO_LIBRISPEECH> \
+  --precision bf16
+
+</details>
+
+3. Pre-flight checklist
+
+Confirm the configuration file exists and matches the model variant you want to train.
+
+Prepare the required datasets and verify all paths/manifests.
+
+Confirm the multilingual character vocabulary covers all training transcripts.
+
+Verify GPU count, CUDA, PyTorch, and Mamba package compatibility.
+
+Use a precision mode supported by the hardware and training code.
+
+Save the configuration and software versions with the experiment for reproducibility.
 
 📦 Checkpoints and inference
 
-Pretrained model checkpoints are referenced in the paper as available through the SpeechTek Hugging Face organization.
+The paper refers to checkpoints being available through the SpeechTek Hugging Face organization.
 
-This README does not assume a specific checkpoint filename or inference command. Once the checkpoint and inference interface are published for this repository, add the exact download command and a minimal end-to-end transcription example here.
+The exact checkpoint identifier and inference command are not specified here. Add the verified model ID, download instructions, and a runnable transcription example once those interfaces are published for this repository.
 
 🗂️ Repository structure
 
-The repository includes an assets/ directory for README figures. The training entry point used for CTC experiments is train_CTC.py; the exact configuration and dataset directory layout should be documented alongside the corresponding code and training recipe.
-
-A useful structure for a reproducible release is:
+The current public repository should be treated as the source of truth for the available scripts and configurations. The following is an illustrative layout for documenting the training components; it does not assert that every path already exists.
 
 MLMA/
 ├── assets/
 │   └── Mamba arc.png
-├── hparams/
-│   └── CTC/
-│       └── <MLMA CTC configuration>.yaml
 ├── train_CTC.py
-├── requirement.txt  # or requirements.txt
+├── <MLMA_CTC_config>.yaml
+├── <dataset_root>/
 └── README.md
-
-The tree above is illustrative, not a claim that every listed file is currently present in the repository.
 
 📄 Citation
 
@@ -511,27 +332,20 @@ If you use MLMA in your research, please cite the paper:
 @article{ali2025mlma,
   title   = {MLMA: Towards Multilingual ASR with Mamba-Based Architectures},
   author  = {Ali, Mohamed Nabih and Falavigna, Daniele and Brutti, Alessio},
+  journal = {arXiv preprint arXiv:2510.18684},
   year    = {2025},
   eprint  = {2510.18684},
-  archivePrefix = {arXiv},
-  primaryClass  = {eess.AS},
-  url     = {https://arxiv.org/abs/2510.18684}
+  archivePrefix = {arXiv}
 }
-
-Please check the paper's current publication status and final bibliographic details before using this citation in a camera-ready publication.
 
 🙏 Acknowledgements
 
-MLMA builds on ideas and code from the Mamba and ConMamba research communities. The training recipe is inspired by the Mamba-ASR repository, and the experimental work uses publicly available speech corpora. Please also consult the upstream projects and dataset providers for their respective licenses and acknowledgements.
+This work was carried out at the SpeechTek unit, Fondazione Bruno Kessler (FBK), Trento, Italy.
+
+📬 Contact
+
+For questions or issues, please open a GitHub issue or contact Mohamed Nabih Ali.
 
 📜 License
 
-Please refer to the LICENSE file in this repository. If no license file is present, the code should not be assumed to be released under a particular open-source license.
-
-<div align="center">
-
-MLMA — efficient sequence modeling for multilingual speech recognition
-
-Developed at SpeechTek · Fondazione Bruno Kessler (FBK)
-
-</div>
+Please refer to the repository's LICENSE file for the applicable license. If no license file is present, clarify the license before redistributing the code.
