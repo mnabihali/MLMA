@@ -1,22 +1,24 @@
+<div align="center">
 <img src="assets/362d8d92-5c0d-40e9-88a1-ddead0574a89.png" alt="MLMA logo" width="360"/>
-
-# MLMA: From Mono to MultiLingual ASR with MAmba-Based Architecture
-
-**The first Mamba-based multilingual ASR system trained at scale: 11,840 hours, six European languages.**
-
-[![Paper](https://img.shields.io/badge/Paper-PDF-b31b1b?style=for-the-badge&logo=readthedocs&logoColor=white)](paper/MLMA_Signal_Processing_Open.pdf)
-[![Hugging Face](https://img.shields.io/badge/🤗%20Models-SpeechTek-ffcc4d?style=for-the-badge)](https://huggingface.co/SpeechTek)
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](#-prerequisites)
-[![PyTorch](https://img.shields.io/badge/PyTorch-ee4c2c?style=for-the-badge&logo=pytorch&logoColor=white)](#-prerequisites)
-[![SpeechBrain](https://img.shields.io/badge/Built%20on-SpeechBrain-1f6feb?style=for-the-badge)](https://speechbrain.github.io)
-
-[**Highlights**](#-highlights) ·
-[**Architecture**](#-architecture) ·
-[**Prerequisites**](#-prerequisites) ·
-[**Training**](#-training) ·
-[**Inference**](#-inference-and-checkpoints) ·
-[**Results**](#-results) ·
-[**Citation**](#-citation)
+<h1>MLMA: From Mono to MultiLingual ASR with MAmba-Based Architecture</h1>
+<p><b>The first Mamba-based multilingual ASR system trained at scale: 11,840 hours, six European languages.</b></p>
+<p>
+<a href="paper/MLMA_Signal_Processing_Open.pdf"><img src="https://img.shields.io/badge/Paper-PDF-b31b1b?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Paper"/></a>
+<a href="https://huggingface.co/SpeechTek"><img src="https://img.shields.io/badge/🤗%20Models-SpeechTek-ffcc4d?style=for-the-badge" alt="Hugging Face"/></a>
+<a href="#-prerequisites"><img src="https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/></a>
+<a href="#-prerequisites"><img src="https://img.shields.io/badge/PyTorch-ee4c2c?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/></a>
+<a href="https://speechbrain.github.io"><img src="https://img.shields.io/badge/Built%20on-SpeechBrain-1f6feb?style=for-the-badge" alt="SpeechBrain"/></a>
+</p>
+<p>
+<a href="#-highlights"><b>Highlights</b></a> ·
+<a href="#-architecture"><b>Architecture</b></a> ·
+<a href="#-prerequisites"><b>Prerequisites</b></a> ·
+<a href="#-training"><b>Training</b></a> ·
+<a href="#-inference-and-checkpoints"><b>Inference</b></a> ·
+<a href="#-results"><b>Results</b></a> ·
+<a href="#-citation"><b>Citation</b></a>
+</p>
+</div>
 
 ---
 
