@@ -1,7 +1,3 @@
-<div align="center">
-
-<div align="center">
-
 <img src="assets/362d8d92-5c0d-40e9-88a1-ddead0574a89.png" alt="MLMA logo" width="360"/>
 
 # MLMA: From Mono to MultiLingual ASR with MAmba-Based Architecture
@@ -21,8 +17,6 @@
 [**Inference**](#-inference-and-checkpoints) ·
 [**Results**](#-results) ·
 [**Citation**](#-citation)
-
-</div>
 
 ---
 
@@ -44,9 +38,7 @@ Transformer and Conformer encoders dominate multilingual ASR, but their quadrati
 
 MLMA uses a convolutional front-end, a ConMamba encoder and a CTC head over a shared multilingual character vocabulary. Each encoder block keeps the Conformer's macaron structure but replaces multi-head self-attention with a **bidirectional Mamba (Bi-Mamba)** module.
 
-<div align="center">
 <img src="assets/Mamba%20arc.png" alt="MLMA architecture" width="85%"/>
-</div>
 
 | Component | Setting |
 |---|---|
@@ -216,8 +208,4 @@ If you find this work helpful, please consider citing:
 
 Center of Augmented Intelligence, [Fondazione Bruno Kessler](https://www.fbk.eu), Trento, Italy.
 
-<div align="center">
-
-<sub>You may also like <a href="https://github.com/xi-j/Mamba-ASR">ConMamba for ASR</a>.</sub>
-
-</div>
+You may also like [ConMamba for ASR](https://github.com/xi-j/Mamba-ASR).
