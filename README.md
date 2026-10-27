@@ -79,7 +79,7 @@ Training follows the [SpeechBrain](https://speechbrain.github.io) recipe style, 
 To train a monolingual (English) MLMA encoder with a character-level CTC loss on one GPU:
 
 ```bash
-python train_CTC.py hparams/CTC/mono.yaml --data_folder <YOUR_PATH_TO_CORPORAH> 
+python train_CTC.py hparams/CTC/mono.yaml --data_folder <YOUR_PATH_TO_CORPORA> 
 ```
 
 To train the bilingual (English + Italian) model on one GPU:
