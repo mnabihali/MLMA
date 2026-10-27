@@ -67,7 +67,7 @@ MLMA uses a convolutional front-end, a ConMamba encoder and a CTC head over a sh
 2. **Install packages.**
 
    ```bash
-docker build -f Dockerfile_mamba -t mamba_stek .
+   docker build -f Dockerfile_mamba -t mamba_stek .
    ```
 
    You may need lower or higher versions of `torch`, `torchaudio`, `causal-conv1d` and `mamba-ssm` depending on your hardware and system. Make sure they are compatible with each other.
