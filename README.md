@@ -1,5 +1,5 @@
 <div align="center">
-<img src="assets/362d8d92-5c0d-40e9-88a1-ddead0574a89.png" alt="MLMA logo" width="360"/>
+<img src="assets/362d8d92-5c0d-40e9-88a1-ddead0574a89.png" alt="MLMA logo" width="300"/>
 <h1>MLMA: From Mono to MultiLingual ASR with MAmba-Based Architecture</h1>
 <p><b>The first Mamba-based multilingual ASR system trained at scale: 11,840 hours, six European languages.</b></p>
 <p>
@@ -67,9 +67,7 @@ MLMA uses a convolutional front-end, a ConMamba encoder and a CTC head over a sh
 2. **Install packages.**
 
    ```bash
-   conda create --name MLMA python=3.9
-   conda activate MLMA
-   pip install -r requirements.txt
+docker build -f Dockerfile_mamba -t mamba_stek .
    ```
 
    You may need lower or higher versions of `torch`, `torchaudio`, `causal-conv1d` and `mamba-ssm` depending on your hardware and system. Make sure they are compatible with each other.
@@ -81,19 +79,19 @@ Training follows the [SpeechBrain](https://speechbrain.github.io) recipe style, 
 To train a monolingual (English) MLMA encoder with a character-level CTC loss on one GPU:
 
 ```bash
-python train_CTC.py hparams/CTC/mlma_librispeech.yaml --data_folder <YOUR_PATH_TO_LIBRISPEECH> --precision bf16
+python train_CTC.py hparams/CTC/mono.yaml --data_folder <YOUR_PATH_TO_CORPORAH> 
 ```
 
 To train the bilingual (English + Italian) model on one GPU:
 
 ```bash
-python train_CTC.py hparams/CTC/mlma_en_it.yaml --data_folder <YOUR_PATH_TO_DATA> --precision bf16
+python train_CTC.py hparams/CTC/mlma_en_it.yaml 
 ```
 
 To train the full multilingual MLMA (six languages, 11,840 h) on four GPUs:
 
 ```bash
-torchrun --nproc-per-node 4 train_CTC.py hparams/CTC/mlma_multilingual.yaml --data_folder <YOUR_PATH_TO_DATA> --precision bf16
+torchrun --nproc-per-node 4 train_CTC.py hparams/CTC/mlma_multilingual.yaml 
 ```
 
 ## 🔍 Inference and Checkpoints
@@ -103,7 +101,7 @@ Pretrained checkpoints are available on 🤗 Hugging Face: **[huggingface.co/Spe
 To evaluate a trained model on a test set:
 
 ```bash
-python train_CTC.py hparams/CTC/mlma_multilingual.yaml --data_folder <YOUR_PATH_TO_DATA> --precision bf16 --test_only --pretrained_path <PATH_TO_CHECKPOINT>
+python train_CTC.py hparams/CTC/mlma_multilingual.yaml --data_folder <YOUR_PATH_TO_DATA> --test_only --pretrained_path <PATH_TO_CHECKPOINT>
 ```
 
 ## 📊 Results
